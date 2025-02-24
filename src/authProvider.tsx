@@ -37,7 +37,7 @@ const accessControlStrategies = {
 const authProvider: AuthProvider = {
     login: async ({ username, password }) => {
         try {
-            const response = await axios.post('https://16d3-37-150-82-158.ngrok-free.app/api/admin/login', {
+            const response = await axios.post('https://fce7-37-150-82-158.ngrok-free.app/api/admin/login', {
                 login: username,
                 password: password,
             }, {

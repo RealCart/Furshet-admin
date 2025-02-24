@@ -3,7 +3,7 @@ import { DataProvider, HttpError, fetchUtils } from 'react-admin';
 import addUploadFeature from './addUploadFeature';
 import axios from 'axios';
 
-const API_URL = 'https://16d3-37-150-82-158.ngrok-free.app/api';
+const API_URL = 'https://fce7-37-150-82-158.ngrok-free.app/api';
 
 const httpClient = (url: string, options: RequestInit = {} as RequestInit) => {
     if (!options.headers) {
