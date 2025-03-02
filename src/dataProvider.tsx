@@ -3,7 +3,7 @@ import { DataProvider, HttpError, fetchUtils } from 'react-admin';
 import addUploadFeature from './addUploadFeature';
 import axios from 'axios';
 
-const API_URL = 'https://fce7-37-150-82-158.ngrok-free.app/api';
+const API_URL = 'https://158.179.207.250/api';
 
 const httpClient = (url: string, options: RequestInit = {} as RequestInit) => {
     if (!options.headers) {
@@ -84,6 +84,8 @@ const customDataProvider: DataProvider = new Proxy(uploadCapableDataProvider, {
                 headers: { 'ngrok-skip-browser-warning': 'true' },
                 withCredentials: true,
             });
+
+            console.log(response);
             
             const { drinks, foods } = response.data.data;
             
@@ -117,8 +119,42 @@ const customDataProvider: DataProvider = new Proxy(uploadCapableDataProvider, {
                 'drink-items': 'Напитки',
                 'food-items': 'Еда'
             };
+            console.log("Current data: ", {data: { id: category, name: defaultNames[category] || '', dishes: response.data }});
             return { data: { id: category, name: defaultNames[category] || '', dishes: response.data } };
         }
+
+        if (resource === 'foodCategories' && name === 'update') {
+            const { id, data } = params;
+            try {
+                const url = `${API_URL}/${id}`;
+                console.log('Old DATA: ', data.dishes);
+                const arr = data.dishes.map((item: any) => {
+                    const { id, name, description, price, image_path } = item;
+                    return {
+                        id,
+                        name_ru: name,
+                        description_ru: description,
+                        price,
+                        image_path,
+                    };
+                });
+                console.log("New DATA: ", arr);
+                const response = await axios.put(url, arr, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'
+                    },
+                    withCredentials: true,
+                });
+                return { data: response.data };
+            } catch (error: any) {
+                console.error('Ошибка обновления foodCategories:', error);
+                return Promise.reject(
+                    new HttpError('Не удалось обновить категорию', error.response?.status || 500)
+                );
+            }
+        }
+        
 
         return uploadCapableDataProvider[name](resource, params);
     },

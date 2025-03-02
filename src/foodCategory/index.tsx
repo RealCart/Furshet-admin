@@ -8,5 +8,5 @@ export default {
     edit: FoodCategoryEdit,
     list: FoodCategoryList,
     show: FoodCategoryShow,
-    recordRepresentation: 'name.en', // представление записи по полю name на английском
+    recordRepresentation: 'name.en', 
 };

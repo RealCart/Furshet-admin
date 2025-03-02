@@ -10,5 +10,5 @@ export default {
     edit: UserEdit,
     show: UserShow,
     icon: PersonIcon,
-    recordRepresentation: 'fullName',
+    recordRepresentation: 'fullName.en',
 };
