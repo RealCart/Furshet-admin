@@ -15,7 +15,7 @@ const FoodCategoryCreate = () => (
     <Create redirect="list">
         <SimpleForm>
             <TextInput source="name" label="Название категории" validate={required()} />
-            <ArrayInput source="dishes" label="Блюда">
+            <ArrayInput source="item" label="Блюда">
                 <SimpleFormIterator>
                     <TextInput source="name" label="Название блюда" validate={required()} />
                     <TextInput source="description" label="Описание" validate={required()} />

@@ -13,26 +13,26 @@ import {
 } from 'react-admin';
 import { useFormContext, useWatch } from 'react-hook-form';
 
-const DishesArrayInput = () => {
+const ItemsArrayInput = () => {
     const { control, getValues, setValue } = useFormContext();
-    const dishes = useWatch({ name: 'dishes', control });
+    const items = useWatch({ name: 'items', control });
 
     React.useEffect(() => {
-        if (dishes && dishes.length) {
-            const lastIndex = dishes.length - 1;
-            const lastDish = dishes[lastIndex];
+        if (items && items.length) {
+            const lastIndex = items.length - 1;
+            const lastDish = items[lastIndex];
             if (!lastDish.id) {
-                const maxId = dishes.reduce((max, dish) => {
+                const maxId = items.reduce((max, dish) => {
                     const dishId = dish && dish.id ? Number(dish.id) : 0;
                     return dishId > max ? dishId : max;
                 }, 0);
-                setValue(`dishes.${lastIndex}.id`, maxId + 1);
+                setValue(`items.${lastIndex}.id`, maxId + 1);
             }
         }
-    }, [dishes, setValue]);
+    }, [items, setValue]);
 
     return (
-        <ArrayInput source="dishes" label="Блюда">
+        <ArrayInput source="items" label="Блюда">
             <SimpleFormIterator>
                 <TextInput source="id" label="ID блюда" readOnly />
                 <TextInput source="name" label="Название блюда" validate={required()} />
@@ -57,7 +57,7 @@ const FoodCategoryEdit = props => (
             <TranslatableInputs locales={['en']}>
                 <TextInput source="name" label="Название категории" validate={required()} />
             </TranslatableInputs>
-            <DishesArrayInput />
+            <ItemsArrayInput />
         </SimpleForm>
     </Edit>
 );

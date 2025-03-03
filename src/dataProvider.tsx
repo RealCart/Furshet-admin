@@ -30,7 +30,7 @@ const baseDataProvider = simpleRestProvider(API_URL, httpClient);
 const uploadCapableDataProvider = addUploadFeature(baseDataProvider);
 
 const customDataProvider: DataProvider = new Proxy(uploadCapableDataProvider, {
-    get: (target, name) => async (resource, params) => {
+    get: (target, name) => async (resource : any, params: any) => {
         if (typeof name === 'symbol' || name === 'then') {
             return;
         }
@@ -79,74 +79,78 @@ const customDataProvider: DataProvider = new Proxy(uploadCapableDataProvider, {
         }
 
         if (resource === 'foodCategories' && name === 'getList') {
-            const url = `${API_URL}/all-items`;
+            const url = `${API_URL}/categories`;
             const response = await axios.get(url, {
                 headers: { 'ngrok-skip-browser-warning': 'true' },
                 withCredentials: true,
             });
-
+        
             console.log(response);
-            
-            const { drinks, foods } = response.data.data;
-            
-            const records = [
-                {
-                    id: 'drink-items',
-                    name: { en: 'Напитки' },
-                    dishes: drinks || [],
-                },
-                {
-                    id: 'food-items',
-                    name: { en: 'Еда' },
-                    dishes: foods || [],
-                }
-            ];
-            
+        
+            const categories = response.data;
+        
+            const records = categories.map(category => ({
+                id: category.id,
+                name: { en: category.name },
+                dishes: category.items || [],
+            }));
+        
             return {
                 data: records,
                 total: records.length,
             };
-        }
+        }        
 
         if (resource === 'foodCategories' && name === 'getOne') {
-            const category = params.id; 
-            const response = await axios.get(`${API_URL}/${category}`, {
+            const {id} = params; 
+            const response = await axios.get(`${API_URL}/categories/${id}`, {
                 headers: { 'ngrok-skip-browser-warning': 'true' },
                 withCredentials: true,
             });
             console.log(response)
-            const defaultNames: Record<string, string> = {
-                'drink-items': 'Напитки',
-                'food-items': 'Еда'
-            };
-            console.log("Current data: ", {data: { id: category, name: defaultNames[category] || '', dishes: response.data }});
-            return { data: { id: category, name: defaultNames[category] || '', dishes: response.data } };
+
+            return response
         }
 
         if (resource === 'foodCategories' && name === 'update') {
             const { id, data } = params;
             try {
-                const url = `${API_URL}/${id}`;
-                console.log('Old DATA: ', data.dishes);
-                const arr = data.dishes.map((item: any) => {
-                    const { id, name, description, price, image_path } = item;
-                    return {
-                        id,
-                        name_ru: name,
-                        description_ru: description,
-                        price,
-                        image_path,
-                    };
-                });
-                console.log("New DATA: ", arr);
-                const response = await axios.put(url, arr, {
+                const url = `${API_URL}/categories/${id}`;
+                console.log('Changed DATA: ', data);
+                const response = await axios.put(url, data, {
                     headers: {
                         'Accept': 'application/json',
                         'ngrok-skip-browser-warning': 'true'
                     },
                     withCredentials: true,
                 });
+                
+                console.log("Server response: ", response);
                 return { data: response.data };
+            } catch (error: any) {
+                console.error('Ошибка обновления foodCategories:', error);
+                return Promise.reject(
+                    new HttpError('Не удалось обновить категорию', error.response?.status || 500)
+                );
+            }
+        }
+
+        if (resource === 'foodCategories' && name === 'create') {
+            const {data} = params
+            try {
+                const url = `${API_URL}/categories`
+                console.log('posting data: ', data);
+                const response = await axios.post(url, data, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'
+                    },
+                    withCredentials: true,
+                });
+
+                console.log("Post categories: ", response);
+
+                return response;
             } catch (error: any) {
                 console.error('Ошибка обновления foodCategories:', error);
                 return Promise.reject(
